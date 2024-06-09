@@ -1,0 +1,13 @@
+// Some rigorous comparison!   stack below
+42                          // [42]
+40 2 +                      // [42, 42]
+if (==) {                   // [1] -> []
+    99 100                  // [99, 100]
+    if (<) {                // [1] -> []
+        2 0 *               // [0]
+        0                   // [0, 0]
+        if (>) "???"        // [0] -> []
+        else "it works!"    // ["it workd!"]
+        print               // []
+    }
+}

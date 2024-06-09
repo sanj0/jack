@@ -1,0 +1,393 @@
+/*
+ * Jack's small standard library
+*/
+
+// ========== Constants ========== \\
+
+macro MAX_INT 2147483647 ;;
+macro MIN_INT -2147483648 ;;
+macro true 1 ;;
+macro false 0 ;;
+
+// ========== Stack control ========== \\
+
+macro drop
+    $"drop"{ [any] -> [] "pop" }
+;;
+
+macro dup
+    $"dup"{ [T] -> [T, T] "dup" }
+;;
+
+macro swap
+    $"swap"{ [A, B] -> [B, A] "swap" }
+;;
+
+macro dupx1
+    $"dupx1"{ [A, B] -> [B, A, B] "dup_x1" }
+;;
+
+macro dup2
+    swap dupx1 swap dupx1
+;;
+
+macro drop2
+    drop drop
+;;
+
+// ========== Operators ========== \\
+
+macro +
+    typeswitch {
+        [int, int] -> $"+"{ [int, int] -> [int] "iadd" }
+        [] -> cmperr "`+` didn't find two same-type numbers on stack!"
+    }
+;;
+
+macro -
+    typeswitch {
+        [int, int] -> $"-"{ [int, int] -> [int] "isub" }
+        [] -> cmperr "`-` didn't find two same-type numbers on stack!"
+    }
+;;
+
+macro *
+    typeswitch {
+        [int, int] -> $"*"{ [int, int] -> [int] "imul" }
+        [] -> cmperr "`*` didn't find two same-type numbers on stack!"
+    }
+;;
+
+macro /
+    typeswitch {
+        [int, int] -> $"/"{ [int, int] -> [int] "idiv" }
+        [] -> cmperr "`/` didn't find two same-type numbers on stack!"
+    }
+;;
+
+macro ==
+    typeswitch {
+        [int, int] -> $"=="{
+            [int, int] -> [int]
+            "if_icmpeq $+7
+            iconst_0
+            goto $+4
+            iconst_1"
+        }
+        [string, string] -> $"=="{
+            [string, string] -> [int]
+            "invokevirtual java/lang/String/equals(Ljava/lang/Object;)Z"
+        }
+        [list[T], list[T]] -> $"=="{
+            [list[T], list[T]] -> [int]
+            "invokevirtual java/util/ArrayList/equals(Ljava/lang/Object;)Z"
+        }
+        [] -> cmperr "expected two items of the same type on stack for `==`"
+    }
+;;
+
+macro <
+    typeswitch {
+        [int, int] -> $"<"{
+            [int, int] -> [int]
+            "if_icmplt $+7
+            iconst_0
+            goto $+4
+            iconst_1"
+        }
+    }
+;;
+
+macro >
+    typeswitch {
+        [int, int] -> $">"{
+            [int, int] -> [int]
+            "if_icmpgt $+7
+            iconst_0
+            goto $+4
+            iconst_1"
+        }
+    }
+;;
+
+macro <=
+    typeswitch {
+        [int, int] -> $"<="{
+            [int, int] -> [int]
+            "if_icmple $+7
+            iconst_0
+            goto $+4
+            iconst_1"
+        }
+    }
+;;
+
+macro >=
+    typeswitch {
+        [int, int] -> $">="{
+            [int, int] -> [int]
+            "if_icmpge $+7
+            iconst_0
+            goto $+4
+            iconst_1"
+        }
+    }
+;;
+
+macro ++
+    typeswitch {
+        [int] -> { 1 + }
+        [] -> cmperr "`++` expects an `int`"
+    }
+;;
+
+macro --
+    typeswitch {
+        [int] -> { 1 - }
+        [] -> cmperr "`--` expects an `int`"
+    }
+;;
+
+macro @int {
+    typeswitch {
+        [string] -> $"@int"{
+            [string] -> [int]
+            "invokestatic java/lang/Integer/parseInt(Ljava/lang/String;)I"
+        }
+        [int] -> cmperr "already an `int` on stack!"
+        [list[any]] -> cmperr "cannot `@int` a list!"
+    }
+};;
+
+macro @string {
+    typeswitch {
+        [int] -> _int_to_integer
+        [] -> {}
+    }
+    $"@string"{
+        [T] -> [string]
+        "invokevirtual java/lang/Object/toString()Ljava/lang/String;"
+    }
+};;
+
+macro @charlist {
+    typeswitch {
+        [string] -> $"@charlist" {
+            2
+            [string] -> [list[int]]
+            "invokevirtual java/lang/String/codePoints()Ljava/util/stream/IntStream;
+            invokeinterface java/util/stream/IntStream/boxed()Ljava/util/stream/Stream; 1
+            invokestatic java/util/stream/Collectors/toList()Ljava/util/stream/Collector;
+            invokeinterface java/util/stream/Stream/collect(Ljava/util/stream/Collector;)Ljava/lang/Object; 2
+            checkcast java/util/Collection
+            new java/util/ArrayList
+            dup_x1
+            swap
+            invokespecial java/util/ArrayList/<init>(Ljava/util/Collection;)V"
+        }
+        [] -> cmperr "`@charlist` expect a `string` on stack!"
+    }
+};;
+
+// ========== Input / output ========== \\
+
+macro print
+    typeswitch {
+        [int] -> {
+            $"print"{
+                1
+                [int] -> []
+                "getstatic java/lang/System/out Ljava/io/PrintStream;
+                swap
+                invokevirtual java/io/PrintStream/print(I)V"
+            }
+        }
+        [T] -> {
+            $"print"{
+                1
+                [T] -> []
+                "getstatic java/lang/System/out Ljava/io/PrintStream;
+                swap
+                invokevirtual java/io/PrintStream/print(Ljava/lang/Object;)V"
+            }
+        }
+    }
+;;
+
+macro printc
+    $"printc" {
+    1
+    [int] -> []
+"getstatic java/lang/System/out Ljava/io/PrintStream;
+swap
+invokevirtual java/io/PrintStream/print(C)V"
+    }
+;;
+
+macro readln
+    $"readln" {
+    1
+    [] -> [string]
+"invokestatic java/lang/System/console()Ljava/io/Console;
+invokevirtual java/io/Console/readLine()Ljava/lang/String;"
+    }
+;;
+
+macro readln_as_list {
+    readln @charlist
+};;
+
+macro println {
+    print '\n' printc
+};;
+
+// ========== System ========== \\
+
+macro exit
+    $"exit"{ [int] -> [] "invokestatic java/lang/System/exit(I)V" }
+;;
+macro okexit { 0 exit };;
+
+// ========== Control structures ========== \\
+
+macro loop
+    while (true)
+;;
+
+macro not {
+    0 ==
+};;
+
+macro or
+    + 1 >=
+;;
+
+macro and
+    + 1 >
+;;
+
+// ========== Lists ========== \\
+
+macro push
+    typeswitch {
+        [int] -> _int_to_integer
+        [] -> {}
+    }
+    $"push"{
+        [list[T], T] -> [int]
+        "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z"
+    }
+    drop
+;;
+
+macro pop
+    dup
+    len --
+    $"pop"{
+        [list[T], int] -> [T]
+        "invokevirtual java/util/ArrayList/remove(I)Ljava/lang/Object;"
+    }
+    typeswitch {
+        [int] -> _integer_to_int
+        [string] -> _obj_to_string
+        [list[any]] -> _obj_to_list
+    }
+;;
+
+macro len
+    $"len"{ [list[any]] -> [int] "invokevirtual java/util/ArrayList/size()I" }
+;;
+
+macro get
+    typeswitch {
+        [list[int], int] -> {
+            $"get"{
+                [list[int], int] -> [int]
+                "invokevirtual java/util/ArrayList/get(I)Ljava/lang/Object;"
+            }
+            _integer_to_int
+        }
+        [list[string], int] -> {
+            $"get"{
+                [list[string], int] -> [string]
+                "invokevirtual java/util/ArrayList/get(I)Ljava/lang/Object;"
+            }
+            _obj_to_string
+        }
+        [list[list[any]], int] -> {
+            $"get"{
+                [list[list[T]], int] -> [list[T]]
+                "invokevirtual java/util/ArrayList/get(I)Ljava/lang/Object;"
+            }
+            _obj_tlist
+        }
+        [] -> cmperr "expected list[any] and int on stack for `get`"
+    }
+;;
+
+macro set
+    typeswitch {
+        [list[int], int, int] -> {
+            _int_to_integer
+            $"set"{
+                [list[int], int, int] -> []
+                "invokevirtual java/util/ArrayList/set(ILjava/lang/Object;)Ljava/lang/Object;
+                pop"
+            }
+        }
+        [list[T], int, T] -> $"set"{
+            [list[T], int, T] -> []
+            "invokevirtual java/util/ArrayList/set(ILjava/lang/Object;)Ljava/lang/Object;
+            pop"
+        }
+        [] -> cmperr "`set` expects [list[T], int, T] on stack"
+    }
+;;
+
+
+
+macro contains
+    _contains_result = false
+    for (i = 0; swap dupx1 len i swap <; i = {i++}) {
+        dup2 swap
+        if (i get ==) {
+            _contains_result = true
+            i = { swap dup len }
+            swap
+        }
+    }
+    drop2
+    _contains_result
+;;
+
+// ========== Utils ========== \\
+
+macro _integer_to_int
+    $"_integer_to_int"{
+        [] -> []
+        "checkcast java/lang/Integer
+        invokevirtual java/lang/Integer/intValue()I"
+    }
+;;
+
+macro _int_to_integer
+    $"_int_to_integer"{
+        [] -> []
+        "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;"
+    }
+;;
+
+macro _obj_to_string
+    $"_obj_to_string"{
+        [] -> []
+        "checkcast java/lang/String"
+    }
+;;
+
+macro _obj_to_list
+    $"_obj_to_string"{
+        [] -> []
+        "checkcast java/util/ArrayList"
+    }
+;;
+

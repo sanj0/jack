@@ -1,0 +1,22 @@
+n = 20
+buf = list<string>
+for (a = 0; a n <; a = { a++ }) {
+    for (b = 0; b n <; b = { b++ }) {
+        for (c = 0; c n <; c = { c++ }) {
+            for (d = 0; d n <; d = { d++ }) {
+                for (e = 1; e n <; e = { e++ }) {
+                    buf
+                    a b d c e
+                    / * - +
+                    @string
+                    push
+                }
+            }
+        }
+    }
+    // Who needs string concatenation ...
+    a 1 + print
+    " / " print
+    n print
+    " done!\n" print
+}

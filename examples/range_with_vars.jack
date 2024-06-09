@@ -1,0 +1,13 @@
+// Generates a list with numbers 0..n
+// from `f`, stepping `step`
+l = list<int>
+f = 0
+n = 100
+s = 1
+x = f
+while (if (x n >=) false else true) {
+    l x push
+    x = { x s + }
+    // equivalent to x s + := x
+}
+l print

@@ -1,0 +1,19 @@
+// Push the counter onto the stack
+0
+while (true) {
+    // Print the first part of the greeting
+    "I said \"hi\" " print
+    // Duplicate the counter and print it next
+    dup print
+    // Increment the counter
+    1 +
+    // Print the second part of the greeting
+    " times!\n" print
+    // Infinite loop!
+}
+/*
+ * Compiler is not smart enough to realize above is an infinite loop so we have
+ * to clean the stack
+*/
+drop
+
