@@ -1,0 +1,17 @@
+// Adds user input to a list until "q" is read
+// Then print the list
+QUIT = "q"
+l = list<string>
+dowhile {
+    "add: " print
+    input = readln
+    if (input QUIT ==) {
+        false
+    } else {
+        l input push
+        true
+    }
+}
+
+l print
+"\n" print

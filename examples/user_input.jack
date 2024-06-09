@@ -1,0 +1,5 @@
+"What's your name? " print
+readln
+"Hi from Jack, the jVM STack language, " print
+print
+"!\n" print

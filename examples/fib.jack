@@ -1,0 +1,13 @@
+a = 1
+b = 1
+while (true) {
+    a println
+    tmp = b
+    b = a
+    a = { a tmp + }
+    if (a 0 <) {
+        okexit
+    }
+}
+
+#include std.jack

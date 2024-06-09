@@ -1,0 +1,56 @@
+xs = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+os = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+winning_positions = [
+    [1, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 0, 0, 1, 0, 0, 1, 0, 0],
+    [0, 1, 0, 0, 1, 0, 0, 1, 0],
+    [0, 0, 1, 0, 0, 1, 0, 0, 1]
+]
+
+dowhile {
+    print_board
+    "\nPlace an X [0-9]: " print
+    xs
+        readln @int
+        true set
+    if (xs is_winning) {
+        "X wins!\n" print
+        false
+    } else {
+        print_board
+        "\nPlace an O [0-9]: " print
+        os
+            readln @int
+            true set
+        if (os is_winning) {
+            "O wins!\n" print
+            false
+        } else {
+            true
+        }
+    }
+}
+
+macro is_winning
+    winning_positions swap contains
+;;
+
+macro print_board
+    for (y = 0; y 3 <; y = {y++}) {
+        for (x = 0; x 3 <; x = {x++}) {
+            index = { 3 y * x + }
+            if (xs index get) {
+                "X " print
+            } else if (os index get) {
+                "O " print
+            } else {
+                index print ' ' printc
+            }
+        }
+        '\n' printc
+    }
+;;
+
+#include std.jack

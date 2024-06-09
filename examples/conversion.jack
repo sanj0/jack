@@ -1,0 +1,3 @@
+4 @string   print
+"2" @int    print
+"\n"        print

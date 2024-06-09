@@ -1,0 +1,13 @@
+code = readln
+tokens = list<int>
+strings = list<string>
+
+macro TStr 0 ;;
+macro TSym 1 ;;
+macro TNum 2 ;;
+macro TBang 3 ;;
+macro TDollar 4 ;;
+macro TPlus 5 ;;
+macro TDash 6 ;;
+
+#include std.jack

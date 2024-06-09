@@ -1,0 +1,50 @@
+macro Double "JackDouble" ;;
+macro double object(Double) ;;
+
+macro @double {
+    typeswitch {
+        [string] -> $"@double"{
+            [string] -> [double]
+            "invokestatic JackDouble/parse(Ljava/lang/String;)LJackDouble;"
+        }
+        [int] -> $"@double" {
+            1
+            [int] -> [double]
+            "invokestatic JackDouble/make(I)LJackDouble;"
+        }
+        [] -> cmperr "`@double` (alias `d`) converts an int or a string to a double!"
+    }
+};;
+
+macro d @double ;;
+
+macro dadd $"dadd"{
+    [double, double] -> [double]
+    "invokevirtual JackDouble/add(LJackDouble;)LJackDouble;"
+};;
+
+macro dsub $"dsub"{
+    [double, double] -> [double]
+    "invokevirtual JackDouble/sub(LJackDouble;)LJackDouble;"
+};;
+
+macro dmul $"dmul"{
+    [double, double] -> [double]
+    "invokevirtual JackDouble/mul(LJackDouble;)LJackDouble;"
+};;
+
+macro ddiv $"ddiv"{
+    [double, double] -> [double]
+    "invokevirtual JackDouble/div(LJackDouble;)LJackDouble;"
+};;
+
+macro dfloor $"dfloor"{
+   [double] -> [double]
+   "invokevirtual JackDouble/floor()LJackDouble;"
+};;
+
+macro dceil $"dceil"{
+   [double] -> [double]
+   "invokevirtual JackDouble/ceil()LJackDouble;"
+};;
+

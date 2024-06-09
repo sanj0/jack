@@ -1,0 +1,19 @@
+// Generates a list with numbers 0..n
+// from `f`, stepping `step`
+list<int>   // [List]
+/*f=*/0     // [List, Int]
+true while {
+    dupx1   // [Int, List, Int]
+    swap    // [Int, Int, List]
+    dupx1   // [Int, List, Int, List]
+    swap    // [Int, List, List, Int]
+    push    // [Int, List]
+    swap    // [List, Int]
+    /*s=*/1+// [List, Int]
+    if (dup /*n=*/100 ==)
+        false
+    else
+        true
+}
+drop        // [List]
+print       // []
